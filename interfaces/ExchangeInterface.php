@@ -2,18 +2,20 @@
 namespace app\components\DBexchangePlan\interfaces;
 
 /**
- * Интерфейс отправки и приема пакетов
+ * Интерфейс: отправка и прием пакетов
  *
- * @author VLF
+ * @author <wberdnik@gmail.com>
  */
 interface ExchangeInterface {
 
+    
     /** Регистрация изменений моделей SerializationInterface  Model::afterSave
      * 
      * @param bool $insert - запись ActiveRecord в режиме insert
      * @param SerializationInterface $model
      */
     public static function touch(bool $insert, SerializationInterface $model): void;
+    
     
     /** Массовая регистрация изменений моделей SerializationInterface  Model::UpdateAll, DeleteAll
      * 
@@ -22,7 +24,8 @@ interface ExchangeInterface {
      */
     public static function multiTouch(array $condition, string $className): void;
 
-    /** Извлечь массив для отправки
+    
+    /** Извлечь пакет для отправки
      * 
      * @param string $node - consumer
      * @param int $startCanary - начало интервала канарееечного отбора
@@ -30,6 +33,7 @@ interface ExchangeInterface {
      */
     public static function fetch(string $node,int $startCanary = 0, int $endCanary = 100): ?array;
 
+    
     /** Применить пакет
      * 
      * @param string $node - producer
@@ -38,12 +42,14 @@ interface ExchangeInterface {
      */
     public static function apply(string $node, array $pack): ?int;
 
+    
     /** Фиксация квитанции пакета 
      * 
      * @param string $node - consumer
      * @param int $ackQueueNumber - подтверждаемая квитанция
      */
     public static function acknowledge(string $node, int $ackQueueNumber): void;
+    
     
     /** Регистрация ошибки при обмене
      * 
