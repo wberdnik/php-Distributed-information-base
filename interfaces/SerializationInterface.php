@@ -4,7 +4,7 @@ namespace app\components\DBexchangePlan\interfaces;
 /**
  * Модель, поддерживающая этот интерфейс, автоматически региструется в плане обмена
  *
- * @author VLF
+ * @author <wberdnik@gmail.com>
  */
 interface SerializationInterface {
     /**
