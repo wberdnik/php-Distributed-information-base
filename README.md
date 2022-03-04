@@ -83,8 +83,8 @@ use app\components\DBexchangePlan\SerializableActiveRecord;
  * This is the model class for table "{{%example}}".
  *
  * @property int $id
- * @property string $name Оффер
- * @property int $active
+ * @property string $name - payload
+ * @property int $active - simulate deletion
  */
 class Example extends SerializableActiveRecord
 {
