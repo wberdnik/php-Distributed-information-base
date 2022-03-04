@@ -1,4 +1,4 @@
-# php-Distributed-information-base
+# Data exhange component for Yii2
 
 The Data exchange component for replication entityes between yii2 sites with pattern similarly 1C:Distributed information base
 
