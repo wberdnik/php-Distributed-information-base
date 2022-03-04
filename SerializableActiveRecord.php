@@ -8,21 +8,25 @@ use yii\db\ActiveRecord;
 use yii\web\HttpException;
 
 /**
- * Родительский класс для моделей, которые позволяют обмениваться данными с Leadinka (и не только)
+ * Родительский класс для моделей, которые позволяют обмениваться данными 
  *
- * @author VLF
+ * @author <wberdnik@gmail.com>
  */
 abstract class SerializableActiveRecord extends ActiveRecord implements SerializationInterface {
 
-    /** При однонаправленном обмене, получатель может отключать регистрацию в плане обмена
-     * ПОЗДНЕГО СТАТИЧЕСКОГО СВЯЗЫВАНИЯ ДЛЯ ПЕРЕМЕННЫХ НЕ СУЩЕСТВУЕТ!!!!!!
-     * @var bool 
+    private $_RegisterPlanObj = true;
+    private static $bks = [];
+
+    
+    /** При однонаправленном обмене, получатель может отключать регистрацию в плане обмена? переопределив этот метод
+      * @var bool 
      */
     public static function toRegisterPlan() {
         return true;
     }
 
-    /** При однонаправленном обмене, получатель может отключать генерацию UID  у себя
+    
+    /** При однонаправленном обмене, получатель может отключать генерацию бизнесс-ключа
      *
      * @var bool 
      */
@@ -30,18 +34,13 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return true;
     }
 
-    /** Переменная для передачи статуса из save в afterSave 
-     *
-     * @var bool
-     */
-    private $_RegisterPlanObj = true;
-    private static $bks = [];
-
+        
     /**
-     * {@inheritdoc}
+     * {@inheritdoc} 
      */
     abstract public static function ModelUniversalName(string $node): string;
 
+    
     /**
      * {@inheritdoc}
      */
@@ -73,6 +72,7 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return null;
     }
 
+    
     /** Заполнение полей при получении
      * 
      * @param SerializationInterface|null $AR  Если NULL - новая запись, иначе найдена в БД
@@ -92,7 +92,8 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         }
     }
 
-    /** Заменяет Бизнес-ключ на локальное значение Primary key
+
+    /** Маппит Бизнес-ключ на локальное значение Primary key
      * 
      * @param array $values - входной пакет
      * @param array $translateMap Пример ['city_id' => \app\models\City::className(),]
@@ -127,11 +128,7 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return $values;
     }
 
-    /**
-     * Атрибуты для сборки бизнесключа
-     */
-//    abstract public static function AttributesOfBusinesKey(): array;
-
+    
     /**
      * Атрибуты для серилизации и отправки
      */
@@ -153,20 +150,22 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return $ans;
     }
 
-    /**
-     * Пришли сведения, что удаленно(remote) записи удалены 
-     * Решите сами что с этим делать
+    
+    /** Действие, если другая сторона удалила сущность
+     * 
      */
     abstract public static function onRemoteDeletes(array $uids, string $node): void;
 
-    /** Кто может получать данные из это таблицы
+    
+    /** Идентификаторы сайтов Yii, которые получают пакеты обмена из текущего
      * @return array of string Список получателей. Если null - ВСЕ получатели из config
      */
     public static function shallTouchCustomers(): ?array {
         return null;
     }
 
-    /**
+    
+    /** Универсальный идентификатор
      * 
      * @return string - универсальная ссылка, из типа (UniversalName) и бизнес ключа
      */
@@ -174,6 +173,7 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return static::getModelUniversalName($node) . ':::' . $this->getBusinesKeyValue($node);
     }
 
+    
     /**
      * {@inheritdoc}
      */
@@ -189,10 +189,15 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return parent::beforeSave($insert);
     }
 
+    
+    /**
+     * {@inheritdoc}
+     */
     public function getPlan() {
         return $this->hasMany(ExchangePlan::className(), ['uid' => static::getColumnBusinesKey()]);
     }
 
+    
     /**
      * {@inheritdoc}
      */
@@ -205,8 +210,9 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         parent::afterSave($insert, $changedAttributes);
     }
 
-    /**
-     * {@inheritdoc}
+    
+    /** Запись модели без регистрации в плане обмена
+     * 
      */
     public function pureSave(bool $runValidation = true, ?array $attributeNames = null): bool {
         $this->_RegisterPlanObj = false;
@@ -216,6 +222,7 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return $res;
     }
 
+    
     /**
      * {@inheritdoc}
      */
@@ -226,6 +233,7 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return parent::updateAll($attributes, $condition, $params);
     }
 
+    
     /**
      * {@inheritdoc}
      */
@@ -236,6 +244,7 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return parent::deleteAll($condition, $params);
     }
 
+    
     /**
      * {@inheritdoc}
      */
@@ -246,9 +255,10 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return parent::beforeDelete();
     }
 
-    /**
+    
+    /** Геттер списка полей для генерации бизнес-ключа
      * 
-     * @return array - список всех КОЛОНОК бизнес ключей, которые должны быть в таблице
+     * @return array - список всех КОЛОНОК бизнес-ключей, которые должны быть в таблице
      */
     protected static function getBkColumns() {
         $cln = static::className();
@@ -265,26 +275,8 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return self::$bks [$cln];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-//    public function attributes() {
-    //Не получается. Долюит в debug/default/Index
-//        $last = parent::attributes();
-//        $bkColumns = static::getBkColumns();
-//        $tableName = static::tableName();
-//        foreach ($bkColumns as $bk) {// по всем бизнес ключам
-//            if (!in_array($bk, $last)) {
-//                $indName = 'inx_' . str_replace(['`', "'", '{', '}', '%'], ['',], $tableName) . '_' . $bk;
-//                $this->getDb()->createCommand('ALTER TABLE ' . $tableName . ' ADD COLUMN `' . $bk . '` VARCHAR(36) DEFAULT ""')->execute();
-//                $this->getDb()->createCommand('ALTER TABLE ' . $tableName . ' ADD INDEX `' . $indName . '` (`' . $bk . '`)')->execute();
-//                throw new HttpException(400, 'Добавление UID(' . $bk . '), перезагрузите. А еще лучше переинициализируйте в консоли.');
-//            }
-//        }
-//        return parent::attributes();
-//    }
-
-    /**
+    
+     /**
      * {@inheritdoc}
      */
     public function encode(string $node): array {
@@ -295,9 +287,10 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return [static::ModelUniversalName($node) => $pack];
     }
 
+    
     /** Чтение модели при отправке данных
      * 
-     * @param array $list - ожидаемый список отправки
+     * @param array $list - ожидаемый список полей отправки
      * @return array - массив атрибут->значение
      */
     public function readAR(array $list, string $node): array {
@@ -308,6 +301,7 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return $pack;
     }
 
+    
     /** Расчет бизнес-ключа по атрибутам
      * 
      * @return string
@@ -316,6 +310,7 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return CryptoHelper::getGUID();
     }
 
+    
     /**
      * {@inheritdoc}
      */
@@ -324,7 +319,8 @@ abstract class SerializableActiveRecord extends ActiveRecord implements Serializ
         return $this->$bk;
     }
 
-    /** Хорошо если бизнес ключи в РИБ не пересекаются. Функция должна быть чистая
+    
+    /** Имя бизнес-ключа в модели
      * 
      * @return string - имя атрибута бизнес ключа для участника, Если $node = '', то тот, который должен показываться по внешнему ключу getPlan
      */
