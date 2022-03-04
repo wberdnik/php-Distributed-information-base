@@ -15,7 +15,8 @@ SerializableActiveRecord class extending the ActiveRecord class is a parent clas
 
 Excluded on public
 ------------------
-Classes: ExchangeControllerBase, ExchangeAction, command/ExchangeController, helper/CryptoHelper. File: config
+Classes: ExchangeControllerBase, ExchangeAction, command/ExchangeController, helper/CryptoHelper. File: config.php
+
 I'm sorry
 
 
