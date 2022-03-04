@@ -13,10 +13,13 @@ use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
 
 /**
- * This is the model class for table
+ * This is the model class for table a ExchangePlan
  */
 class ExchangePlan extends ActiveRecord implements ExchangeInterface {
 
+	/** enum of kind of record
+	*
+	*/
     CONST SPEC_REGULAR = 0;
     CONST SPEC_SENDED = 1;
     CONST SPEC_OUT_NUMBER = 2;
@@ -27,6 +30,7 @@ class ExchangePlan extends ActiveRecord implements ExchangeInterface {
     private static $config = null;
     private static $errors = [];
 
+	
     /**
      * @inheritdoc
      */
@@ -35,6 +39,7 @@ class ExchangePlan extends ActiveRecord implements ExchangeInterface {
         parent::init();
     }
 
+	
     /**
      * @inheritdoc
      */
@@ -42,6 +47,7 @@ class ExchangePlan extends ActiveRecord implements ExchangeInterface {
         return '{{%excange_plan}}';
     }
 
+	
     /**
      * @inheritdoc
      */
@@ -70,27 +76,13 @@ class ExchangePlan extends ActiveRecord implements ExchangeInterface {
         ];
     }
 
+	
     private static function reconfig(): void {
         if (!self::$config) {
             self::$config = include __DIR__ . '/config.php'; //$params = require(__DIR__ . '/params.php');           
         }
     }
 
-    public static function getOutPackTemplate(string $customer): array {
-        self::reconfig();
-        $ans = self::$config['packet'];
-        $ans['producer'] = self::$config['root'];
-        $ans['customer'] = $customer;
-        return $ans;
-    }
-
-    private static function CrashAndAlert($message) {
-        if (Yii::$app->request->isConsoleRequest) {
-            echo "\n ERRROR: $message\n";
-            die();
-        }
-        throw new HttpException($message);
-    }
 
     /** Регистрация ошибки при обмене
      * 
@@ -105,7 +97,8 @@ class ExchangePlan extends ActiveRecord implements ExchangeInterface {
         }
     }
 
-    /** Анти DRY
+	
+    /** Единый алгоритм touch для методов интерфейса
      * Внимание, должен быть настроен config
      * 
      * @param array $node2bks 
@@ -189,6 +182,7 @@ class ExchangePlan extends ActiveRecord implements ExchangeInterface {
         }
     }
 
+	
     /** Массовая регистрация изменений моделей SerializationInterface  Model::UpdateAll, DeleteAll
      * 
      * @param array $condition - отбор по модели
@@ -230,6 +224,7 @@ class ExchangePlan extends ActiveRecord implements ExchangeInterface {
         }
     }
 
+	
     /** Регистрация изменений/удалений моделей SerializationInterface
      * 
      * @param bool $insert - запись ActiveRecord в режиме insert
@@ -257,7 +252,8 @@ class ExchangePlan extends ActiveRecord implements ExchangeInterface {
         }
     }
 
-    /** DRY получение номера с инициализацией
+	
+    /** Получение номера с инициализацией
      * 
      * @param string $node узел
      * @param int $special - Константа - входящий/исходящий
@@ -277,6 +273,7 @@ class ExchangePlan extends ActiveRecord implements ExchangeInterface {
         return $AR;
     }
 
+	
     /** Извлечь массив для отправки
      * 
      * @param string $node - consumer
@@ -408,6 +405,8 @@ class ExchangePlan extends ActiveRecord implements ExchangeInterface {
         return $answerPack;
     }
 
+	
+	
     /** Применить пакет
      * 
      * @param string $node - producer
@@ -524,6 +523,7 @@ class ExchangePlan extends ActiveRecord implements ExchangeInterface {
         return (int) $pack['packNumber'];
     }
 
+	
     /** Получение подтвеждения пакета 
      * 
      * @param string $node - consumer
