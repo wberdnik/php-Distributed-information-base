@@ -5,7 +5,7 @@ The Data exchange component for replication entityes between yii2 sites with pat
 ExchangePlan
 ------------
 
-ExchangePlan class extending the ActiveRecord class is a Model to replicate changes and exchanges entityes. One implements ExchangeInterface with methoods for
+ExchangePlan class extending the ActiveRecord class is a Model to replicate changes and exchanges entityes. One implements ExchangeInterface with methods for
 registration of changes(touch, multiTouch), procesing a exchage packet (fetch, apply), acknowledgment (acknowledge), other (addExchError)
 
 SerializableActiveRecord
