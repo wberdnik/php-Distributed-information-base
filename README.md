@@ -13,6 +13,12 @@ SerializableActiveRecord
 
 SerializableActiveRecord.php extending the ActiveRecord class is a parent class for entity models who participate in exchange. This class implements the SerializationInterface. Child classes should configure the lists of attributes to be passed and how to serialize them.
 
+Excluded on public
+------------------
+Classes: ExchangeControllerBase, ExchangeAction, command/ExchangeController, helper/CryptoHelper. File: config
+I'm sorry
+
+
 Example
 -------
 Controller of the destination side
